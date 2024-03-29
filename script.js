@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('grid');
     const restartBtn = document.getElementById('restartBtn');
+    const modeSelector = document.getElementById('modeSelector');
     let currentPlayer = 'X';
     let gameBoard = ['', '', '', '', '', '', '', '', ''];
     let gameOver = false;
+    let mode = 'person'; // Default mode is person vs. person
 
     // Function to create grid buttons
     function createGridButtons() {
@@ -15,11 +17,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameBoard[i] = currentPlayer;
                     btn.textContent = currentPlayer;
                     checkWinner();
-                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    if (mode === 'person') {
+                        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    } else {
+                        if (!gameOver) {
+                            computerMove();
+                        }
+                    }
                 }
             });
             grid.appendChild(btn);
         }
+    }
+
+    // Function to make computer move
+    function computerMove() {
+        let availableMoves = gameBoard.map((val, index) => val === '' ? index : '').filter(String);
+        let randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        gameBoard[randomMove] = 'O';
+        document.querySelectorAll('.grid-btn')[randomMove].textContent = 'O';
+        checkWinner();
+        currentPlayer = 'X';
     }
 
     // Function to check for a winner
@@ -52,8 +70,15 @@ document.addEventListener('DOMContentLoaded', () => {
         createGridButtons();
     }
 
-    // Event listener for restart button
+    // Function to change game mode
+    function changeMode() {
+        mode = modeSelector.value;
+        restartGame();
+    }
+
+    // Event listeners
     restartBtn.addEventListener('click', restartGame);
+    modeSelector.addEventListener('change', changeMode);
 
     // Initialize the game
     createGridButtons();
